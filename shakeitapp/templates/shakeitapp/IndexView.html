@@ -1,0 +1,64 @@
+{% extends 'main.html' %}
+{% load widget_tweaks %}
+{% load shakeitapp_extras %}
+{% load static %}
+
+{% block content %}
+    <div class="content">
+        <div class="trends__tabs">
+            {% for trend in trends %}
+            <input id="id_trends_{{ trend.index }}" name="trends" type="radio" value="" {{ trend.radio }}>
+            <label for="id_trends_{{ trend.index }}" onclick="switchCarousel('{{ trend.index }}');">
+                <span class="trend__header">{{ trend.name }}</span>
+            </label>
+            {% endfor %}
+        </div>
+        {% for trend in trends %}
+            <div id="id_carousel_box_{{ trend.index }}" class="carousel__box">
+                {% for slide in slides %}
+                <input id="id_carousel_{{ trend.index }}_radio_{{ slide.index }}" name="slides_{{ trend.index }}" type="radio" value="" {{ slide.radio }}>
+                {% endfor %}
+                {% for slide in slides %}
+                <div id="id_carousel_{{ trend.index }}_slide_{{ slide.index }}" class="carousel__slide">
+                    <div class="slide__controls">
+                        <span class="slide__controls__prev"><label for="id_carousel_{{ trend.index }}_radio_{{ slide.prev }}">&lsaquo;</label></span>
+                        <span class="slide__controls__next"><label for="id_carousel_{{ trend.index }}_radio_{{ slide.next }}">&rsaquo;</label></span>
+                    </div>
+                    <div id="id_carousel_box_{{ trend.index }}_slide_box_{{ slide.index }}" class="corousel__slide__box">
+                        {% with cocktail=trend|get_cocktail:slide.index %}
+                        <img src="{{ cocktail|get_cocktail_image }}" alt="{{ trend|get_cocktail:slide.index|get_cocktail_name }}">
+                        {% endwith %}
+                        <div class="corousel__slide__box__title">
+                            <a href="/cocktail/{{ trend|get_cocktail:slide.index|get_cocktail_url }}">
+                                <h2>{{ trend|get_cocktail:slide.index|get_cocktail_name }}</h2>
+                            </a>
+                        </div>
+                        <div class="corousel__slide__box__anno">
+                            <div class="corousel__slide__box__anno__dark">
+                            {{ trend|get_cocktail:slide.index|get_cocktail_anno}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block footer_js%}
+<script src="{% static 'scripts/main.js' %}" defer></script>
+<script>window.onload = () => {switchCarousel('{{ trends.0.index }}');}</script>
+{% endblock %}
+
+{% block additional_styles %}
+    {% for trend in trends %}
+        <style>
+        {% for slide in slides %}
+        #id_carousel_{{ trend.index }}_radio_{{ slide.index }}:checked~#id_carousel_{{ trend.index }}_slide_{{ slide.index }}{% if not forloop.last %},{% else %} {
+            display: flex;
+        } {% endif %}
+        {% endfor %}
+        </style>
+    {% endfor %}
+{% endblock %}

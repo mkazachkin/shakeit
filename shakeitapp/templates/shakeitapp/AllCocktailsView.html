@@ -1,0 +1,47 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<div class="content">
+    {% if cocktails %}
+    {% for cocktail in cocktails %}
+    <div class="cocktail__group">
+        <div class="cocktail__group__title">
+            <a href="/cocktail/{{ cocktail.cocktail_url }}/">
+                <h2>{{ cocktail.cocktail_name }}</h2>
+            </a>
+        </div>
+        <div class="cocktail__group__text">
+            <a href="/cocktail/{{ cocktail.cocktail_url }}/"><img src="{{ cocktail.cocktail_image.url }}"
+                    alt="{{ cocktail.cocktail_name }}"></a>
+            <p>{{ cocktail.cocktail_anno }}</p>
+        </div>
+    </div>
+    <div class="cocktail__group__text">Автор: {{ cocktail.cocktail_author }}</div>
+    {% endfor %}
+    {% if next or previous %}
+    <p style="text-align: center; padding: 10px;">
+        {% if previous %}
+        <a href="/cocktails/{{ group_url }}/{{ previous }}/" >Предыдущая страница</a>
+        {% endif %}
+        {% if next and previous %}
+        <span style="margin: 20px;">&nbsp;</span>
+        {% endif %}
+        {% if next %}
+        <a href="/cocktails/{{ group_url }}/{{ next }}/">Следующая страница</a>
+        {% endif %}
+    </p>
+    {% endif %}
+    {% else %}
+    <div class="cocktail__group">
+        <div class="cocktail__group__title">
+            <a href="/cocktails/">
+                <h2>Коктейли не найдены</h2>
+            </a>
+        </div>
+        <div class="cocktail__group__text">
+            <p>Извините, но таких коктейлей в нашей базе данных нет.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

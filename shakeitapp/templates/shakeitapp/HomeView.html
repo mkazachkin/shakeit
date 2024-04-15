@@ -1,0 +1,33 @@
+{% extends 'main.html' %}
+{% block content %}
+<div class="content">
+<div class="cocktail__group">
+    <div class="cocktail__group__title">
+        <h2>Добро пожаловать, {{ user_name }}!</h2>
+    </div>
+    <div class="cocktail__group__text">
+        <p>Теперь вы можете добавлять рецепты коктейлей на наш сайт.</p>
+    </div>
+    <div class="cocktail__group__text">
+        <p>Когда-нибудь, здесь будет редактирование профиля, смена пароля
+        и аватары. Но пока вы можете выйти с нашего сайта
+            по <a href="/logout/" class="colored">ссылке</a>.
+        </p>
+    </div>
+</div>
+    {% if cocktail_likes %}
+<div class="cocktail__group">
+    <div class="cocktail__group__title">
+        <h2>Коктейли в избранном:</h2>
+    </div>
+    <div class="cocktail__group__text">
+        <ul>
+        {% for like in cocktail_likes %}
+        <li><a href="/cocktail/{{ like.ll_cocktail.cocktail_url }}">{{ like.ll_cocktail.cocktail_name }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+    {% endif %}
+</div>
+{% endblock %}

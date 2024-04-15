@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+{% load static %}
+{% load widget_tweaks %}
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} | {{ subtitle }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
+        rel="stylesheet">
+    <link rel="icon" href="{% static 'images/favicon.png' %}">
+    <link rel="stylesheet" href="{% static 'styles/main.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/lists.css' %}">
+    <link rel="stylesheet" href="{% static 'styles/register.css' %}">
+    {% block additional_styles %}
+    {% endblock %}
+    {% block header_js %}
+    {% endblock %}
+</head>
+
+<body>
+    <div class="header">
+        <div class="main__menu">
+            <div class="main__menu__left">
+                <a href="/"><img src="{% static 'images/logo.png' %}" alt="logo"></a>
+            </div>
+            <div class="main__menu__search">
+                <form action="/search/" class="search__form" method="get">
+                    {% for field in search_form.visible_fields %}
+                    {% render_field field %}
+                    {% endfor %}
+                    <button type="submit" class="search__button">Найти</button>
+                </form>
+            </div>
+            <div class="main__menu__right">
+                <div class="main__menu__item"><a href="/cocktails/">Коктейли</a>
+                    <div class="main__menu__item__content">
+                        <ul>
+                            {% for cocktail_group in cocktail_groups %}
+                            <li><a href="/cocktails/{{ cocktail_group.dcg_url }}">{{ cocktail_group.dcg_name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="main__menu__item"><a href="/ingredients/">Ингридиенты</a>
+                    <div class="main__menu__item__content">
+                        <ul>
+                            {% for ingredient_group in ingredients_groups %}
+                            <li><a href="/ingredients/{{ ingredient_group.di_url }}">{{ ingredient_group.di_name }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% if user.is_authenticated %}
+                <div class="main__menu__item"><a href="/add/">Добавить рецепт</a></div>
+                <div class="main__menu__item"><a href="/home/">Личный кабинет</a></div>
+                {% else %}
+                <div class="main__menu__item"><a href="/login/">Войти на сайт</a></div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="welcome__line">
+            <div class="welcome__main">
+                <div class="welcome__main__logo">
+                    <h1>{{ title }}</h1>
+                </div>
+                <div class="welcome__main__text colored">{{ subtitle }}</div>
+            </div>
+            <div class="welcome_pic">
+                <img src="{% static 'images/welcome_pic_0.png' %}" alt="Добро пожаловать на наш сайт!">
+            </div>
+        </div>
+    </div>
+
+    {% block content %}
+    <p>Контента нет. Что-то пошло не так.</p>
+    {% endblock %}
+
+    <div class="footer">
+        <div class="footer__ageinfo colored">21+</div>
+        <div class="footer__about"><a href="https://github.com/mkazachkin/shakeit/blob/main/README.md">О&nbsp;проекте</a></div>
+        <div class="footer__copyright">&copy;&nbsp;2024, Михаил Казачкин</div>
+    </div>
+
+    {% block footer_js %}
+    {% endblock %}
+</body>
+
+</html>

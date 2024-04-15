@@ -1,0 +1,171 @@
+{% extends 'main.html' %}
+{% load widget_tweaks %}
+{% load shakeitapp_extras %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <form id="cocktail_form" method="post" enctype="multipart/form-data" onsubmit="typeMenuSwitch(event);">
+        {% csrf_token %}
+        {% for field in form.hidden_fields %}
+        {% if 'ingredient_' not in field.name %}
+        {% render_field field %}
+        {% endif %}
+        {% endfor %}
+        {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+        <div class="fields__errors__box">
+            {{ error }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% for field in form.visible_fields %}
+        {% if field.errors %}
+        <div class="fields__errors__box">
+            {% for error in field.errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endfor %}
+
+        <div id="id_cocktail_attr" class="cocktail__attributes">
+            {% for field in form.visible_fields %}
+            {% if 'ingredient_' not in field.name %}
+            <div id="id_{{ field.name }}_box" class="box__{{ field.name }}">
+                {{ field.label_tag }}
+                <div id="id_input_box_{{ field.name }}" class="input__box__{{ field.name }}">
+                    {% render_field field %}
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        <div id="id_ingredients" class="box__ingredients">
+            <label>Ингредиенты:</label>
+            {% for i in INGREDIENTS_LIMIT|make_counter %}
+            <div id="id_recipe_item_{{ i }}" class="recipe__item">
+                <div id="id_recipe_item_input_box_{{ i }}" class="recipe__item__input__box">
+                    <div id="id_recipe_item_input_{{ i }}" class="ingredient__input__box">
+                        {% with 'ingredient_input_'|add:i as field_name %}
+                        {% render_field form|get_field:field_name %}
+                        {% endwith %}
+                    </div>
+                    <div id="id_units_selector_box_{{ i }}" class="units__selector__box">
+                        {% with 'ingredient_value_'|add:i as field_name %}
+                        {% render_field form|get_field:field_name %}
+                        {% endwith %}
+                        {% with 'ingredient_unit_'|add:i as field_name %}
+                        {% render_field form|get_field:field_name %}
+                        {% endwith %}
+                    </div>
+                    <div id="id_group_selector_box_{{ i }}" class="group__selector__box">
+                        <div id="group_selector_{{ i }}" class="group__selector__box__info">
+                            <img src="{% static 'images/ingredients/unknown.jpg' %}" alt="Категория не выбрана">Не выбрана
+                        </div>
+                        <div class="group__selector__box__button" onclick="chooseGroup('{{ i }}');">
+                            Сменить категорию
+                        </div>
+                        <div class="group__selector__box__button" onclick="deleteIngredient('{{ i }}');">
+                            Удалить ингредиент
+                        </div>
+                        {% with 'ingredient_group_'|add:i as field_name %}
+                        {% render_field form|get_field:field_name %}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div id="id_buttons" class="box__buttons">
+            <button type="button" class="generic__button" onclick="addIngredient();">Добавить ингредиент</button>
+            <button type="submit" class="generic__button">Сохранить рецепт</button>
+        </div>
+    </form>
+    <div id="choose_group" class="modal__window medium__window">
+        <div class="modal__dialog">
+            <div class="modal__dialog__header">
+                <span>Выберите группу</span>
+                <span onclick='groupMenuSwitch();' class="cursor__pointer">&#10006;</span>
+            </div>
+            <div id="id_recipe__item__groups__box" class="recipe__item__groups__box">
+                {% for ingredient_group in ingredients_groups %}
+                <div id="group_button_{{ forloop.counter0 }}" data-index="{{  ingredient_group.di_url  }}"
+                    data-name="{{ ingredient_group.di_name }}">
+                    <img src="{% static 'images/ingredients/' %}{{ ingredient_group.di_url }}.jpg" class="button__icon" alt="{{ ingredient_group.di_name }}">
+                    {{ ingredient_group.di_name }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div id="choose_cocktail_type" class="modal__window small__window">
+        <div class="modal__dialog">
+            <div class="modal__dialog__header">
+                <span>Выберите группу коктейля</span>
+                <span onclick="typeMenuSwitch();" class="cursor__pointer">&#10006;</span>
+            </div>
+            <div id="id_cocktails__groups__box" class="recipe__type__box">
+                {% for cocktail_group in cocktail_groups %}
+                <div id="type_button_{{ forloop.counter0 }}" data-index="{{ cocktail_group.dcg_url }}"
+                    data-name="{{ cocktail_group.dcg_name }}" onclick="saveCocktail('{{ cocktail_group.dcg_url }}');">
+                    <img src="{% static 'images/cocktails/' %}{{ cocktail_group.dcg_url }}.jpg" class="button__icon" alt="{{ cocktail_group.dcg_name }}">
+                    {{ cocktail_group.dcg_name }}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_js%}
+<script>
+    const INGREDIENTS_LIMIT = {{ INGREDIENTS_LIMIT| escapejs }};
+
+    const RUS = {{ RUS | escapejs }};
+    const RUS_ALL = {{ RUS_ALL | escapejs }};
+    const ENG = {{ ENG | escapejs  }};
+    const ENG_ALL = {{ ENG_ALL | escapejs }};
+    const RUSENG_ALL = {{ RUSENG_ALL | escapejs  }};
+    const COCKTAIL_RU_INPUT = {{ COCKTAIL_RU_INPUT | escapejs }};
+    const COCKTAIL_EN_INPUT = {{ COCKTAIL_EN_INPUT | escapejs }};
+    const COCKTAIL_ANNO = {{ COCKTAIL_ANNO | escapejs }};
+    const COCKTAIL_MAKING = {{ COCKTAIL_MAKING | escapejs }};
+
+    const INPUT_IDS = {};
+    INPUT_IDS[COCKTAIL_RU_INPUT] = 'id_cocktail_name';
+    INPUT_IDS[COCKTAIL_EN_INPUT] = 'id_cocktail_name_translit';
+    INPUT_IDS[COCKTAIL_ANNO] = 'id_cocktail_anno';
+    INPUT_IDS[COCKTAIL_MAKING] = 'id_cocktail_making';
+    for (var i = 0; i < INGREDIENTS_LIMIT; i++) {
+        INPUT_IDS[i] = `id_ingredient_input_${i}`;
+    };
+
+    const PATTERNS = {};
+    PATTERNS[RUS] = /[^0-9А-ЯЁа-яё\- ]/g;
+    PATTERNS[RUS_ALL] = /[^?!,.:;—–0-9А-ЯЁа-яё\-.,:%\s\n]/g;
+    PATTERNS[ENG] = /[^0-9A-Za-z\- ]/g;
+    PATTERNS[ENG_ALL] = /[^?!,.:;—–0-9A-Za-z\-\s\n]/g;
+    PATTERNS[RUSENG_ALL] = /[^?!,.:;—–0-9A-Za-zА-ЯЁа-яё\-\s\n]/g;
+
+    var ingredient_index_global = 0;
+    var adding_in_progress = false;
+    var save_in_progress = false;
+
+    for (var i = 0; i < INGREDIENTS_LIMIT; i++) {
+        var ingredient_name = document.getElementById(`id_ingredient_input_${i}`);
+        var ingredient_value = document.getElementById(`id_ingredient_value_${i}`);
+        var ingredient_group = document.getElementById(`id_ingredient_group_${i}`);
+        if (ingredient_name.value | ingredient_value.value) {
+            var input_box = document.getElementById(`id_recipe_item_input_box_${i}`);
+            changeGroup(i, ingredient_group.value);
+            input_box.style.display = 'flex';
+        } else {
+            ingredient_index_global = i;
+            break;
+        }
+    }
+</script>
+<script src="{% static 'scripts/main.js' %}" defer></script>
+{% endblock %}

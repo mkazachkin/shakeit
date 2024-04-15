@@ -1,0 +1,39 @@
+{% extends 'main.html' %}
+{% load static %}
+{% load shakeitapp_extras %}
+{% block content %}
+<div class="content">
+    {% if ingredients %}
+    <div class="cocktail__group">
+        <div class="cocktail__group__title">
+            <a href="/ingredients/">
+                <h2>Поиск коктейля по ингредиенту</h2>
+            </a>
+        </div>
+    </div>
+    <div class="ingredients__table">
+        {% for ingredient in ingredients %}
+        <div class="ingredient__button__box">
+            <div class="ingredient__button__image">
+                <img src="{{ ingredient.ingredient_url|get_ingredient_img }}" alt="{{ ingredient.ingredient_name }}">
+            </div>
+            <div class="ingredient__button">
+                <a href="{{ ingredient.ingredient_url }}">{{ ingredient.ingredient_name }}</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="cocktail__group">
+        <div class="cocktail__group__title">
+            <a href="/ingredients/">
+                <h2>Ингредиенты не найдены</h2>
+            </a>
+        </div>
+        <div class="cocktail__group__text">
+            <p>Извините, но таких ингредиентов в нашей базе данных нет.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

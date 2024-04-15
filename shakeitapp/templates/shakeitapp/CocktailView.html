@@ -1,0 +1,63 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+<div class="content">
+    {% if cocktail %}
+    <div class="cocktail__group">
+        <div class="cocktail__group__title">
+            <h2>{{ cocktail.cocktail_name }}</h2>
+        </div>
+        <div class="cocktail__group__text">
+            <div class="cocktail__group__text__block">
+                <img src="{{ cocktail.cocktail_image.url }}" alt="{{ cocktail.cocktail_name }}">
+                {% if active_user %}
+                <div class="likes__box">
+                    <div id="id_like_button" class="like__button like__on" onclick="likeClick();" {% if like %} style="display: none;" {% endif %}>
+                        Добавить в&nbsp;закладки
+                    </div>
+                    <div id="id_dislike_button" class="like__button like__off" onclick="likeClick();" {% if not like %} style="display: none;" {% endif %}>
+                        Убрать из&nbsp;закладок
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="cocktail__group__text__block">
+                <p>{{ cocktail.cocktail_anno }}</p>
+                <h3>Автор</h3>
+                <p>{{ cocktail.cocktail_author }}</p>
+                <h3>Вам понадобятся:</h3>
+                <ul>
+                    {% for ingredient in cocktail_ingredients %}
+                    <li>{{ ingredient.ci_ingredient.ingredient_name }}
+                        ({{ ingredient.ci_quantity }}&nbsp;
+                        {{ ingredient.ci_unit.du_name}})</li>
+                    {% endfor %}
+                </ul>
+                <h3>Процесс приготовления:</h3>
+                <p>{{ cocktail.cocktail_making }}</p>
+                {% if active_user %}
+                <form id="id_likes_form" action="{% url 'Likes API' %}" type="text/plain" method="post">
+                    <input id="id_ll_is_like" name="ll_is_like" type="hidden" value="{{ like }}">
+                    <input id=" id_ll_cocktail" name="ll_cocktail" type="hidden" value="{{ cocktail.id }}">
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class=" cocktail__group">
+        <div class="cocktail__group__title">
+            <a href="/cocktails/{{ item.dcg_url }}/">
+                <h2>Коктейль не найден.</h2>
+            </a>
+        </div>
+        <div class="cocktail__group__text">
+            <p>Извините, но таких коктейлей в нашей базе данных нет.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+{% block footer_js %}
+<script src="{% static 'scripts/api.js' %}" defer type="text/javascript" charset="utf-8"></script>
+{% endblock %}

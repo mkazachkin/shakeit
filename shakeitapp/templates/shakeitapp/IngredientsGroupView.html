@@ -1,0 +1,19 @@
+{% extends 'main.html' %}
+{% load static %}
+{% block content %}
+    <div class="content">
+        {% for item in ingredients_groups %}
+        <div class="cocktail__group">
+            <div class="cocktail__group__title">
+                <a href="/ingredients/{{ item.di_url }}/">
+                    <h2>{{ item.di_name }}</h2>
+                </a>
+            </div>
+            <div class="cocktail__group__text">
+                <a href="/ingredients/{{ item.di_url }}/"><img src="{% static 'images/ingredients/' %}{{ item.di_url }}.jpg" alt="{{ item.di_name }}"></a>
+                <p>{{ item.di_anno }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

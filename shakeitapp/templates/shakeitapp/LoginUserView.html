@@ -1,0 +1,17 @@
+{% extends 'main.html' %}
+{% block content %}
+<div class="content">
+    <div class="register__user">
+        <form id="login_form" method="post">
+            {% csrf_token %}
+            <div class="register__box">
+                {{ form.as_div }}
+            </div>
+        </form>
+    </div>
+    <div id="id_buttons" class="box__buttons">
+        <button type="submit" class="generic__button" form="login_form">Войти</button>
+        <button type="submit" class="generic__button" onclick="location.href='/register/';">Зарегистрироваться</button>
+    </div>
+</div>
+{% endblock %}

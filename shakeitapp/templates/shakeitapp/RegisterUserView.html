@@ -1,0 +1,16 @@
+{% extends 'main.html' %}
+{% block content %}
+<div class="content">
+    <div class="register__user">
+        <form id="register_form" method="post">
+            {% csrf_token %}
+            <div class="register__box">
+                {{ form.as_div }}
+            </div>
+            <div id="id_buttons" class="box__buttons">
+                <button type="submit" class="generic__button">Зарегистрироваться</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
