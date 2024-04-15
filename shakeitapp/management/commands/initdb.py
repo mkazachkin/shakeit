@@ -56,7 +56,7 @@ class Command(BaseCommand):
             logger.info(f'Данные подготовлены.')
             try:
                 with connection.cursor() as cursor:
-                    cursor.executescript(sql_statement)
+                    cursor.execute(sql_statement)
             except Exception as err:
                 logger.critical(f'Ошибка при добавлении в БД. Работа остановлена.\n{err}')
                 success = False
